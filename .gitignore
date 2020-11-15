@@ -14,3 +14,4 @@
 *~
 *.pyc
 .config*
+rpi3.config*

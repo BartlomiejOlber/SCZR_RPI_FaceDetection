@@ -1,0 +1,2 @@
+INDEX VERSION 1.131+/home/bartlomiej/studia/sczr/buildroot-2020.02.7/package/hello/.metadata/.plugins/org.eclipse.jdt.core
+380923500.index
