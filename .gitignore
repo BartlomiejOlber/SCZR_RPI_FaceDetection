@@ -15,4 +15,4 @@
 *.pyc
 .config*
 rpi3.config*
-/package/hello/.metadata*
+/package/hello/.metadata/
