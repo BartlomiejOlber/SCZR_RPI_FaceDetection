@@ -108,6 +108,11 @@ int main()
             char *args[]={proc_b_name, shm_ab_fname, shm_bc_fname, msgq_ab_fname, msgq_ba_fname, msgq_bc_fname, NULL};
             execv(args[0],args);
     }
+    if ((pid = fork()) == 0){
+            char *args[]={proc_c_name, shm_bc_fname,  msgq_bc_fname, NULL};
+            execv(args[0],args);
+    }
+
 //    if ((pid = fork()) == 0){
 //            char *args[]={proc_c_name, shmid_bc_s, qid_bc_s, NULL};
 //            execv(args[0],args);
