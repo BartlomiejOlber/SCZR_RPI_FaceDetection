@@ -68,21 +68,21 @@ int main()
     FILE * fPtr_3 = fopen(msgq_bc_fname, "w");
     FILE * fPtr_4 = fopen(shm_ab_fname, "w");
     FILE * fPtr_5 = fopen(shm_bc_fname, "w");
-    key_ab = ftok(msgq_ab_fname, 'B');
-	key_ba = ftok(msgq_ba_fname, 'B');
-	key_bc = ftok(msgq_bc_fname, 'B');
-	shmkey_ab = ftok(shm_ab_fname, 'B');
-	shmkey_bc = ftok(shm_bc_fname, 'B');
+//    key_ab = ftok(msgq_ab_fname, 'B');
+//	key_ba = ftok(msgq_ba_fname, 'B');
+//	key_bc = ftok(msgq_bc_fname, 'B');
+//	shmkey_ab = ftok(shm_ab_fname, 'B');
+//	shmkey_bc = ftok(shm_bc_fname, 'B');
 	fclose(fPtr_1);
 	fclose(fPtr_2);
 	fclose(fPtr_3);
 	fclose(fPtr_4);
 	fclose(fPtr_5);
 
-    int shmid_ab = shmget(shmkey_ab,SHM_SIZE,0666|IPC_CREAT);
-    int shmid_bc = shmget(shmkey_bc,SHM_SIZE,0666|IPC_CREAT);
-    sprintf(shmid_ab_s, "%d", shmid_ab);
-    sprintf(shmid_bc_s, "%d", shmid_bc);
+//    int shmid_ab = shmget(shmkey_ab,SHM_SIZE,0666|IPC_CREAT);
+//    int shmid_bc = shmget(shmkey_bc,SHM_SIZE,0666|IPC_CREAT);
+//    sprintf(shmid_ab_s, "%d", shmid_ab);
+//    sprintf(shmid_bc_s, "%d", shmid_bc);
     // shmat to attach to shared memory
 //    char *str = (char*) shmat(shmid,(void*)0,0);
 
@@ -91,9 +91,9 @@ int main()
 //	qid_ab = msgget(key_ab, 0666 | IPC_CREAT);
 //	qid_ba = msgget(key_ba, 0666 | IPC_CREAT);
 //	qid_bc = msgget(key_bc, 0666 | IPC_CREAT);
-    sprintf(qid_ab_s, "%d", (int)key_ab);
-    sprintf(qid_ba_s, "%d", (int)key_ba);
-    sprintf(qid_bc_s, "%d", (int)key_bc);
+//    sprintf(qid_ab_s, "%d", (int)key_ab);
+//    sprintf(qid_ba_s, "%d", (int)key_ba);
+//    sprintf(qid_bc_s, "%d", (int)key_bc);
 
 	int status;
     cout<<"SYSTEM START"<<endl;
@@ -101,11 +101,11 @@ int main()
 //    signal(SIGCHLD, sigchld_handler);
 //    signal(SIGINT, sigint_handler);
     if ((pid = fork()) == 0){
-            char * args[]={proc_a_name, shmid_ab_s, qid_ab_s, qid_ba_s, NULL};
+            char * args[]={proc_a_name, shm_ab_fname, msgq_ab_fname, msgq_ba_fname, NULL};
             execv(args[0],args);
     }
     if ((pid = fork()) == 0){
-            char *args[]={proc_b_name, shmid_ab_s, shmid_bc_s, qid_ab_s, qid_ba_s, qid_bc_s, NULL};
+            char *args[]={proc_b_name, shm_ab_fname, shm_bc_fname, msgq_ab_fname, msgq_ba_fname, msgq_bc_fname, NULL};
             execv(args[0],args);
     }
 //    if ((pid = fork()) == 0){

@@ -1,8 +1,10 @@
 #include <stdio.h>
-#include <string.h>
+#include <stdlib.h>
+#include <unistd.h>
 #include <sys/ipc.h>
 #include <sys/msg.h>
 #include <sys/shm.h>
+#include <sys/mman.h>
 #include <string>
 #include <iostream>
 #include "opencv2/core.hpp"
@@ -87,14 +89,20 @@ int main(int argc, char *argv[])
 	for(int i = 0; i < argc; i++){
 		printf("proca arg%d: %s\n",i , argv[i]);
 	}
-	int shm_idx = atoi(argv[1]);
-	int send_queue_key = atoi(argv[2]);
-	int receive_queue_key = atoi(argv[3]);
-	int send_queue_idx = msgget((key_t)send_queue_key, 0666 | IPC_CREAT);
-	int receive_queue_idx = msgget((key_t)receive_queue_key, 0666 | IPC_CREAT);
+	char* shm_name = argv[1];
+	char* send_queue_name = argv[2];
+	char* receive_queue_name = argv[3];
+	key_t key_shm = ftok(shm_name, 'B');
+	key_t key_send = ftok(send_queue_name, 'B');
+	key_t key_receive = ftok(receive_queue_name, 'B');
+	//!!!!!!!!!!!!!11
+	int send_queue_idx = msgget(key_send, 0666 | IPC_CREAT);
+	int receive_queue_idx = msgget(key_receive, 0666 | IPC_CREAT);
+//!!!!!!!!!!!!!!!!!!!!
 
+    int shmid = shmget(key_shm,1024,0666|IPC_CREAT);
 
-    char *str = (char*) shmat(shm_idx,(void*)0,0);
+    char *str = (char*) shmat(shmid,(void*)0,0);
     int message;
     char reply[128];
     for(int i = 0; i < 10; i++){
