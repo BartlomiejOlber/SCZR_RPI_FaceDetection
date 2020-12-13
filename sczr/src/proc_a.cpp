@@ -88,14 +88,25 @@ int main(int argc, char *argv[])
 		printf("proca arg%d: %s\n",i , argv[i]);
 	}
 	int shm_idx = atoi(argv[1]);
-	int send_queue_idx = atoi(argv[2]);
-	int receive_queue_idx = atoi(argv[3]);
+	int send_queue_key = atoi(argv[2]);
+	int receive_queue_key = atoi(argv[3]);
+	int send_queue_idx = msgget((key_t)send_queue_key, 0666 | IPC_CREAT);
+	int receive_queue_idx = msgget((key_t)receive_queue_key, 0666 | IPC_CREAT);
+
 
     char *str = (char*) shmat(shm_idx,(void*)0,0);
-    int message; //wiadomo
-    msgsnd(send_queue_idx, &message, sizeof(message), 0);
+    int message;
+    char reply[128];
+    for(int i = 0; i < 10; i++){
+    	message = i*i;
+    	cout<<"proca wysyla"<< send_queue_idx <<endl;
+    	msgsnd(send_queue_idx, &message, sizeof(message), 0);
+    	msgrcv(receive_queue_idx, &reply, sizeof(reply), 1, 0);
+    	printf("proca received: %s\n", reply);
+    }
 
-    msgrcv(receive_queue_idx, &message, sizeof(message), 1, 0);
+
+
 
 //
 //    cout<<"Write Data : ";

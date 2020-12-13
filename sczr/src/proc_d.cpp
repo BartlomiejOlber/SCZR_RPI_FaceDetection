@@ -68,11 +68,11 @@ int main()
     FILE * fPtr_3 = fopen(msgq_bc_fname, "w");
     FILE * fPtr_4 = fopen(shm_ab_fname, "w");
     FILE * fPtr_5 = fopen(shm_bc_fname, "w");
-    key_ab = ftok(msgq_ab_fname, 0);
-	key_ba = ftok(msgq_ba_fname, 0);
-	key_bc = ftok(msgq_bc_fname, 0);
-	shmkey_ab = ftok(shm_ab_fname, 0);
-	shmkey_bc = ftok(shm_bc_fname, 0);
+    key_ab = ftok(msgq_ab_fname, 'B');
+	key_ba = ftok(msgq_ba_fname, 'B');
+	key_bc = ftok(msgq_bc_fname, 'B');
+	shmkey_ab = ftok(shm_ab_fname, 'B');
+	shmkey_bc = ftok(shm_bc_fname, 'B');
 	fclose(fPtr_1);
 	fclose(fPtr_2);
 	fclose(fPtr_3);
@@ -88,16 +88,16 @@ int main()
 
 	// msgget creates a message queue
 	// and returns identifier
-	qid_ab = msgget(key_ab, 0666 | IPC_CREAT);
-	qid_ba = msgget(key_ba, 0666 | IPC_CREAT);
-	qid_bc = msgget(key_bc, 0666 | IPC_CREAT);
-    sprintf(qid_ab_s, "%d", qid_ab);
-    sprintf(qid_ba_s, "%d", qid_ba);
-    sprintf(qid_bc_s, "%d", qid_bc);
+//	qid_ab = msgget(key_ab, 0666 | IPC_CREAT);
+//	qid_ba = msgget(key_ba, 0666 | IPC_CREAT);
+//	qid_bc = msgget(key_bc, 0666 | IPC_CREAT);
+    sprintf(qid_ab_s, "%d", (int)key_ab);
+    sprintf(qid_ba_s, "%d", (int)key_ba);
+    sprintf(qid_bc_s, "%d", (int)key_bc);
 
 	int status;
     cout<<"SYSTEM START"<<endl;
-    cout<<key_ab << endl;
+//    cout<<qid_ab << "   "<<qid_ba<< endl;
 //    signal(SIGCHLD, sigchld_handler);
 //    signal(SIGINT, sigint_handler);
     if ((pid = fork()) == 0){
