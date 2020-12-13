@@ -18,14 +18,21 @@
 using namespace cv;
 using namespace std;
 
+typedef struct mesg_buffer {
+    long mesg_type;
+    char mesg_text[100];
+} Message;
+
 int main(int argc, char *argv[])
 {
 	for(int i = 0; i < argc; i++){
 		printf("procb arg%d: %s\n", i, argv[i]);
 	}
 
-	char* shm_ab_name = argv[1], shm_bc_name = argv[2];
-	char* send_queue_name_a = argv[4], send_queue_name_c = argv[5];
+	char* shm_ab_name = argv[1];
+	char* shm_bc_name = argv[2];
+	char* send_queue_name_a = argv[4];
+	char* send_queue_name_c = argv[5];
 	char* receive_queue_name_a = argv[3];
 //	int send_queue_idx_a = msgget((key_t)send_queue_key_a, 0666 );
 //	int send_queue_idx_c = msgget((key_t)send_queue_key_a, 0666 );
@@ -47,16 +54,15 @@ int main(int argc, char *argv[])
 
     char *str_ab = (char*) shmat(shmid_a,(void*)0,0);
     char *str_bc = (char*) shmat(shmid_c,(void*)0,0);
-    int message;
-
+    Message message;
     for(int i = 0; i < 10; i++){
-    	cout<<"procb czeka"<< receive_queue_idx_a<<endl;
     	msgrcv(receive_queue_idx_a, &message, sizeof(message), 1, 0);
-    	string reply = "received: ";
-    	reply += to_string(message);
-    	msgsnd(send_queue_idx_a, reply.c_str(), sizeof(reply.c_str()), 0);
 
-    	printf("procb received: %d\n", message);
+    	printf("procb received: %s\n", message.mesg_text);
+    	sprintf(message.mesg_text, "%d", i+i);
+    	msgsnd(send_queue_idx_a,&message , sizeof(message), 0);
+
+
     }
     return 0;
 }
