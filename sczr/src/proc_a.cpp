@@ -47,7 +47,7 @@ int main(int argc, char *argv[])
 //    printf("---->> Processing in\t %d cycles \t= %f ms.\n", t_proc,((float)t_proc)*1000./CLOCKS_PER_SEC);
 //    printf("---->> Saving     in\t %d cycles \t= %f ms.\n", t_save,((float)t_save)*1000./CLOCKS_PER_SEC);
 //    for(int i = 0; i<10; ++i){
-//		string fname = "chuuujapturedimg";
+//		string fname = "capturedimg";
 //		fname+= to_string(i);
 //		fname+= ".jpg";
 //		// show the image on the window
@@ -88,7 +88,15 @@ int main(int argc, char *argv[])
 		printf("proca arg%d: %s\n",i , argv[i]);
 	}
 	int shm_idx = atoi(argv[1]);
-//    char *str = (char*) shmat(shmid,(void*)0,0);
+	int send_queue_idx = atoi(argv[2]);
+	int receive_queue_idx = atoi(argv[3]);
+
+    char *str = (char*) shmat(shm_idx,(void*)0,0);
+    int message; //wiadomo
+    msgsnd(send_queue_idx, &message, sizeof(message), 0);
+
+    msgrcv(receive_queue_idx, &message, sizeof(message), 1, 0);
+
 //
 //    cout<<"Write Data : ";
 //    gets(str);
@@ -99,12 +107,15 @@ int main(int argc, char *argv[])
 //
 //    printf("Data read from memory: %s\n",str);
 //
-//    //detach from shared memory
-//    shmdt(str);
-//
-//    // destroy the shared memory
-//    shmctl(shmid,IPC_RMID,NULL);
 
 
     return 0;
 }
+/*
+ * proc_a.cpp
+ *
+ *  Created on: Dec 12, 2020
+ *      Author: bartlomiej
+ */
+
+
