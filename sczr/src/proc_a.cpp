@@ -25,23 +25,13 @@ typedef struct mesg_buffer {
 int main(int argc, char *argv[])
 {
 
-//	for(int i = 0; i < argc; i++){
-//		printf("proca arg%d: %s\n",i , argv[i]);
-//	}
-	char* shm_name = argv[1];
-	char* send_queue_name = argv[2];
-	char* receive_queue_name = argv[3];
-	key_t key_shm = ftok(shm_name, 'B');
-	key_t key_send = ftok(send_queue_name, 'B');
-	key_t key_receive = ftok(receive_queue_name, 'B');
+	int shm_id = atoi(argv[1]);
+	int send_queue_idx= atoi(argv[2]);
+	int receive_queue_idx = atoi(argv[3]);
 
-	int send_queue_idx = msgget(key_send, 0666 | IPC_CREAT);
-	int receive_queue_idx = msgget(key_receive, 0666 | IPC_CREAT);
+	Message message;
+    char *str = (char*) shmat(shm_id,(void*)0,0);
 
-
-    int shmid = shmget(key_shm,1024,0666|IPC_CREAT);
-    Message message;
-    char *str = (char*) shmat(shmid,(void*)0,0);
     for(int i = 0; i < 10; i++){
     	message.mesg_type = 1;
     	sprintf(message.mesg_text, "%d", i*i);
@@ -51,28 +41,7 @@ int main(int argc, char *argv[])
     	printf("proca received: %s\n", message.mesg_text );
     }
 
-
-
-
-//
-//    cout<<"Write Data : ";
-//    gets(str);
-//
-//    printf("Data written in memory: %s\n",str);
-//
-//    char *str = (char*) shmat(shmid,(void*)0,0);
-//
-//    printf("Data read from memory: %s\n",str);
-//
-
-
     return 0;
 }
-/*
- * proc_a.cpp
- *
- *  Created on: Dec 12, 2020
- *      Author: bartlomiej
- */
 
 
