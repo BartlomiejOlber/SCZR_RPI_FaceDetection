@@ -7,13 +7,13 @@
 #include <sys/ipc.h>
 #include <sys/msg.h>
 #include <sys/shm.h>
-#include <sys/mman.h>
+
 #include "opencv2/core.hpp"
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
 
 
-#include <time.h>       /* clock_t, clock, CLOCKS_PER_SEC */
+#include <time.h>
 
 using namespace cv;
 using namespace std;
@@ -27,25 +27,12 @@ typedef struct mesg_buffer
 
 int main(int argc, char *argv[])
 {
-	for(int i = 0; i < argc; i++)
-	{
-		printf("proc_c arg%d: %s\n", i, argv[i]);
-	}
-	char* shm_bc_name = argv[1];
-	char* receive_queue_name_b = argv[2];
-	char* send_queue_name_b = argv[3];
 
-	key_t key_shm_bc = ftok(shm_bc_name, 'B');
-	key_t key_receive_b = ftok(receive_queue_name_b, 'B');
-	key_t key_send_b = ftok(send_queue_name_b, 'B');
+	int shmid_b = atoi(argv[1]);
+	int send_queue_idx_b= atoi(argv[3]);
+	int receive_queue_idx_b = atoi(argv[2]);
 
-	//!!!!!!!!!!!!!11
-	int receive_queue_idx_b = msgget(key_receive_b, 0666 | IPC_CREAT);
-	int send_queue_idx_b = msgget(key_send_b, 0666 | IPC_CREAT);
 	
-    //!!!!!!!!!!!!!!!!!!!!
-
-    int shmid_b = shmget(key_shm_bc, 640*480*3 ,0666|IPC_CREAT);
 	u_char *frame = (u_char*) shmat(shmid_b,(void*)0,0);
 
 	Message message;

@@ -29,19 +29,12 @@ int main(int argc, char *argv[])
 //	for(int i = 0; i < argc; i++){
 //		printf("proca arg%d: %s\n",i , argv[i]);
 //	}
-	char* shm_name = argv[1];
-	char* send_queue_name = argv[2];
-	char* receive_queue_name = argv[3];
-	key_t key_shm = ftok(shm_name, 'B');
-	key_t key_send = ftok(send_queue_name, 'B');
-	key_t key_receive = ftok(receive_queue_name, 'B');
-
-	int send_queue_idx = msgget(key_send, 0666 | IPC_CREAT);
-	int receive_queue_idx = msgget(key_receive, 0666 | IPC_CREAT);
-
+	int shm_id = atoi(argv[1]);
+	int send_queue_idx= atoi(argv[2]);
+	int receive_queue_idx = atoi(argv[3]);
 
 	size_t size = 640*480*3;
-    int shmid = shmget(key_shm, 640*480*3, 0666|IPC_CREAT);
+
 	
 	if(shmid<0)
 	{
