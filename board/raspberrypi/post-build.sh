@@ -14,4 +14,5 @@ chmod 755 ${TARGET_DIR}/etc/init.d/S10mdev
 cp package/busybox/mdev.conf ${TARGET_DIR}/etc/mdev.conf
 cp board/raspberrypi3/interfaces ${TARGET_DIR}/etc/network/interfaces
 cp board/raspberrypi3/wpa_supplicant.conf ${TARGET_DIR}/etc/wpa_supplicant.conf
+cp -r board/raspberrypi3/haarcascades ${TARGET_DIR}/root/haarcascades
 echo "PermitRootLogin yes" >> ${TARGET_DIR}/etc/ssh/sshd_config
