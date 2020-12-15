@@ -176,7 +176,6 @@ int main()
 		start_children(children_args);
 		wait_for_children();
 	}
->>>>>>> proc_c_develop
     return 0;
 }
 
