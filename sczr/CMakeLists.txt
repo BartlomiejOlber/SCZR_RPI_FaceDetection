@@ -21,13 +21,16 @@ endif()
 set(SOURCE_A src/proc_a.cpp)
 set(SOURCE_B src/proc_b.cpp)
 set(SOURCE_D src/proc_d.cpp)
+set(SOURCE_C src/proc_c.cpp)
 
 #add_library(testOpencv STATIC ${SOURCES})
 
 add_executable(proc_a ${SOURCE_A})
 add_executable(proc_b ${SOURCE_B})
 add_executable(proc_d ${SOURCE_D})
+add_executable(proc_c ${SOURCE_C})
 
 # Link your application with OpenCV libraries
 target_link_libraries(proc_a ${OpenCV_LIBS})
 target_link_libraries(proc_b ${OpenCV_LIBS})
+target_link_libraries(proc_c ${OpenCV_LIBS})
