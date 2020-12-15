@@ -1,4 +1,3 @@
-
 #include <string>
 #include <iostream>
 #include <stdio.h>
@@ -18,55 +17,67 @@
 using namespace cv;
 using namespace std;
 
+int shmid_b;
+int send_queue_idx_b;
+int receive_queue_idx_b;
+
 typedef struct mesg_buffer 
 {
     long mesg_type;
     int mesg_text[100];
 } Message;
 
+Message message;
+int receive_faces(vector<Mat> &detected_faces)
+	{
+		Mat crop;
+		Rect face_frame;
+		//vector<Mat> detected_faces;
+		msgrcv(receive_queue_idx_b, &message, sizeof(message), 1, 0);
+		u_char *frame = (u_char*) shmat(shmid_b,(void*)0,0);
+		cout<<"\tC - odebrano: "<<message.mesg_text[99]<<" twarzy\n";
+		
+		stringstream ss;
+		for(int i=0; i<message.mesg_text[99]; i++)
+		{
+			ss.str(string());
+			face_frame.x = 0;
+			face_frame.y = 0;
+			face_frame.width = message.mesg_text[3*i];
+			face_frame.height = message.mesg_text[3*i];
+			//stworz nowy Mat z wymiarami takimi jak odebrana klatka
+			Mat *tmp_c = new Mat(message.mesg_text[3*i], message.mesg_text[3*i], 16);
+			//podlacz dane Mata do pamieci wspoldzielonej
+			tmp_c->data = (frame+message.mesg_text[3*i+2]);
+			//stworz na podstawie
+			crop = (*tmp_c)(face_frame);
+			//zmieniamy step w crop zeby dalo sie zapisac do zdjecia
+			crop.step = message.mesg_text[3*i+1];
+			detected_faces.push_back(crop);
+		}
+		msgsnd(send_queue_idx_b,&message , sizeof(message), 0);
+
+		return time(NULL);
+	}
+
+
 
 int main(int argc, char *argv[])
 {
 
-	int shmid_b = atoi(argv[1]);
-	int send_queue_idx_b= atoi(argv[3]);
-	int receive_queue_idx_b = atoi(argv[2]);
+	shmid_b = atoi(argv[1]);
+	send_queue_idx_b= atoi(argv[3]);
+	receive_queue_idx_b = atoi(argv[2]);
 
-	
-	u_char *frame = (u_char*) shmat(shmid_b,(void*)0,0);
 
-	Message message;
-	int timer=0;
-
-	Mat crop;
-	Rect face_frame;
-	while (timer<100)
+	vector<Mat> wektor;
+	int curr_time;
+	while (true)
 	{
+		wektor.clear();
+        curr_time = receive_faces(wektor);
 		
-        msgrcv(receive_queue_idx_b, &message, sizeof(message), 1, 0);
-		u_char *frame = (u_char*) shmat(shmid_b,(void*)0,0);
-
-		cout<<"takie wymiary otrzymalismy: "<<message.mesg_text[0]<<", "<<message.mesg_text[1]<<", "<<message.mesg_text[2]<<endl;
-		face_frame.x = 0;
-		face_frame.y = 0;
-		face_frame.width = message.mesg_text[0];
-		face_frame.height = message.mesg_text[0];
-		
-		Mat *tmp_c = new Mat(message.mesg_text[0], message.mesg_text[1], 16);
-		//podlaczamy tmp_c do pamieci dizelonej
-		tmp_c->data = frame+message.mesg_text[];
-
-		crop = (*tmp_c)(face_frame);
-		cout<<"sizeof frame (IN C): "<<crop.rows<<", "<<crop.cols<<", "<<crop.step<<endl;
-		crop.step = message.mesg_text[2];
-		imwrite("ZAPISANE OD C.jpg",crop);
-		//cout<<"ZAPISANO\n";
-		msgsnd(send_queue_idx_b,&message , sizeof(message), 0);
-		timer++;
-		//przeczyta mordy
-		//zapisze do wektora
-		//do kolejki do_b wysle ze odczytalo
-		// wyslanie kolejki 
+		//tutaj bedize komunikacja z serwerem
 	}
     return 0;
 }
