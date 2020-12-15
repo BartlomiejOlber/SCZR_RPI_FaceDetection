@@ -59,8 +59,12 @@ int main(int argc, char *argv[])
 
 	Mat *tmp = new Mat(480,640,curr_frame.type());
 	int timer= 0;
-	while ( capture.read(curr_frame))
+	int i = 0;
+	cout<<"a1"<<endl;
+	while ( capture.read(curr_frame) && i<50)
     {
+		i++;
+		cout<<"a2 "<<i<<endl;
         if( (curr_frame).empty() )
         {
             std::cout << "--(!) No captured frame -- Break!\n";

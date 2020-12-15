@@ -14,6 +14,20 @@
 
 #include <time.h>
 
+#include <websocketpp/config/asio_no_tls_client.hpp>
+
+#include <websocketpp/client.hpp>
+
+typedef websocketpp::client<websocketpp::config::asio_client> client;
+
+using websocketpp::lib::placeholders::_1;
+using websocketpp::lib::placeholders::_2;
+using websocketpp::lib::bind;
+
+// pull out the type of messages sent by our config
+typedef websocketpp::config::asio_client::message_type::ptr message_ptr;
+
+
 using namespace cv;
 using namespace std;
 
@@ -72,8 +86,11 @@ int main(int argc, char *argv[])
 
 	vector<Mat> wektor;
 	int curr_time;
-	while (true)
-	{
+	int i = 0;
+	cout<<"c1"<<endl;
+	while(i<50){
+		cout<<"c2 "<< i <<endl;
+		i++;
 		wektor.clear();
         curr_time = receive_faces(wektor);
 		

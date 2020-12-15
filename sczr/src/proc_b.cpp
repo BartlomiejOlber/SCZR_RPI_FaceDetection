@@ -59,8 +59,10 @@ int main(int argc, char *argv[])
 	u_char *frame_a = (u_char*) shmat(shmid_a,(void*)0,0);
 	u_char *frame_c = (u_char*) shmat(shmid_c,(void*)0,0);
 	//u_char przesylane[100] = "PRZESLANE GITARA SIEMA\0";
-	while (true)
-	{
+	int i = 0;
+	while(i<50){
+		cout<<"b1 "<<i<<endl;
+		i++;
 		msgrcv(receive_queue_idx_a, &message, sizeof(message), 1, 0);
 		tmp_a->data = frame_a;
 		

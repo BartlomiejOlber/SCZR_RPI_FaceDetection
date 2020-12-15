@@ -155,7 +155,10 @@ void wait_for_children()
 
 int main()
 {
-	while(1){
+	int i = 0;
+	while(i<5){
+		cout<<"d1"<<endl;
+		i++;
 		vector<string>mq_names = {"msgqueue_ab", "msgqueue_ba", "msgqueue_bc", "msgqueue_cb"};
 		vector<string>proc_names = {"proc_a", "proc_b", "proc_c"};
 		vector<string>shm_names = {"shm_ab", "shm_bc"};
@@ -169,12 +172,16 @@ int main()
 		get_shared_memory_segments(shm_ftoks);
 		get_message_queues(mq_ftoks);
 		ipc_ids_to_string(ipc_ids);
+		cout<<"d2"<<endl;
 		signal(SIGCHLD, sigchld_handler);
-		signal(SIGINT, sigint_handler);
-		signal(SIGTERM, sigint_handler);
+//		signal(SIGINT, sigint_handler);
+//		signal(SIGTERM, sigint_handler);
 		make_children_args(children_args, ipc_ids, proc_names);
+		cout<<"d3"<<endl;
 		start_children(children_args);
+		cout<<"d4"<<endl;
 		wait_for_children();
+		cout<<"d5"<<endl;
 	}
     return 0;
 }

@@ -59,8 +59,12 @@ int main(int argc, char *argv[])
 
 	Mat *tmp = new Mat(480,640,curr_frame.type());
 	int timer= 0;
-	while ( capture.read(curr_frame)  && timer <100)
+	int i = 0;
+	cout<<"a1"<<endl;
+	while ( capture.read(curr_frame))
     {
+		i++;
+		cout<<"a2 "<<i<<endl;
         if( (curr_frame).empty() )
         {
             std::cout << "--(!) No captured frame -- Break!\n";
@@ -68,27 +72,13 @@ int main(int argc, char *argv[])
         }
 		else
 		{
+			//pobraz timestamp
 			tmp->data = frame;
 			memcpy((u_char*)(tmp->data), curr_frame.data, curr_frame.step*curr_frame.rows);	
 			message.mesg_type = 1;
 			msgsnd(send_queue_idx, &message, sizeof(message), 0);
     		msgrcv(receive_queue_idx, &message, sizeof(message), 1, 0);
-			// message.mesg_text[0]=curr_frame.rows;
-			// message.mesg_text[1]=curr_frame.cols;
-			// message.mesg_text[2]=curr_frame.step;
-			// message.mesg_text[10] = 42;
-			//sprintf(message.mesg_text, "%s", "wyslano klatke");
-			//message.mesg_dims = 42;
-			// message.mesg_type = 32;
-			//strcpy(message.mesg_dims,"DUPA");
-			//cout<<"proc_a wysyla: "<< message.mesg_text[10]<< endl;
-			// if( cv::waitKey(10) == 27 )
-			// {
-			// 	break; // escape
-			// 	return 0;
-			// }
 		}
-		timer++;
 
     }
 
