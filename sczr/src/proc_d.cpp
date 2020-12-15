@@ -11,6 +11,7 @@
 #include <wait.h>
 #include <vector>
 #include <string>
+// #include "my_sched.hpp"
 
 using namespace std;
 
@@ -157,7 +158,7 @@ int main()
 {
 	while(1){
 		vector<string>mq_names = {"msgqueue_ab", "msgqueue_ba", "msgqueue_bc", "msgqueue_cb"};
-		vector<string>proc_names = {"proc_a", "proc_b", "proc_c"};
+		vector<string>proc_names = {"/usr/bin/proc_a", "/usr/bin/proc_b", "/usr/bin/proc_c"};
 		vector<string>shm_names = {"shm_ab", "shm_bc"};
 		vector<string>ipc_ids;
 		vector<key_t>shm_ftoks, mq_ftoks;
