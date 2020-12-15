@@ -61,13 +61,14 @@ int main()
     key_t key_ab, key_ba, key_bc, shmkey_ab, shmkey_bc;
     char qid_ab_s[16], qid_ba_s[16], qid_bc_s[16], shmid_ab_s[16], shmid_bc_s[16];
     char proc_a_name[8] = "proc_a", proc_b_name[8] = "proc_b", proc_c_name[8] = "proc_c";
-    char msgq_ab_fname[16] = "msgqueue_ab", msgq_ba_fname[16] = "msgqueue_ba", msgq_bc_fname[16] = "msgqueue_bc";
+    char msgq_ab_fname[16] = "msgqueue_ab", msgq_ba_fname[16] = "msgqueue_ba", msgq_bc_fname[16] = "msgqueue_bc",msgq_cb_fname[16] = "msgqueue_cb";
     char shm_ab_fname[16] = "shm_ab", shm_bc_fname[16] = "shm_bc";
     FILE * fPtr_1 = fopen(msgq_ab_fname, "w");
     FILE * fPtr_2 = fopen(msgq_ba_fname, "w");
     FILE * fPtr_3 = fopen(msgq_bc_fname, "w");
     FILE * fPtr_4 = fopen(shm_ab_fname, "w");
     FILE * fPtr_5 = fopen(shm_bc_fname, "w");
+    FILE * fPtr_6 = fopen(msgq_cb_fname, "w");
 //    key_ab = ftok(msgq_ab_fname, 'B');
 //	key_ba = ftok(msgq_ba_fname, 'B');
 //	key_bc = ftok(msgq_bc_fname, 'B');
@@ -78,6 +79,7 @@ int main()
 	fclose(fPtr_3);
 	fclose(fPtr_4);
 	fclose(fPtr_5);
+    fclose(fPtr_6);
 
 //    int shmid_ab = shmget(shmkey_ab,SHM_SIZE,0666|IPC_CREAT);
 //    int shmid_bc = shmget(shmkey_bc,SHM_SIZE,0666|IPC_CREAT);
@@ -105,11 +107,11 @@ int main()
             execv(args[0],args);
     }
     if ((pid = fork()) == 0){
-            char *args[]={proc_b_name, shm_ab_fname, shm_bc_fname, msgq_ab_fname, msgq_ba_fname, msgq_bc_fname, NULL};
+            char *args[]={proc_b_name, shm_ab_fname, shm_bc_fname, msgq_ab_fname, msgq_ba_fname, msgq_bc_fname, msgq_cb_fname, NULL};
             execv(args[0],args);
     }
     if ((pid = fork()) == 0){
-            char *args[]={proc_c_name, shm_bc_fname,  msgq_bc_fname, NULL};
+            char *args[]={proc_c_name, shm_bc_fname,  msgq_bc_fname, msgq_cb_fname, NULL};
             execv(args[0],args);
     }
 
