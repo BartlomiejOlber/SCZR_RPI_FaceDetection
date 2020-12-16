@@ -11,13 +11,17 @@
 #include <wait.h>
 #include <vector>
 #include <string>
-// #include "my_sched.hpp"
+#include <string.h>
+#include <errno.h>
+#include <sys/resource.h>
 
 using namespace std;
 
 vector<pid_t> children;
 vector<int> shm_ids;
 vector<int> mq_ids;
+pid_t my_pid = getpid();
+
 int SHM_SIZE = 640*480*3;
 
 void kill_children()
@@ -156,9 +160,11 @@ void wait_for_children()
 
 int main()
 {
+	//setpriority(PRIO_USER,0,-20);
+
 	while(1){
 		vector<string>mq_names = {"msgqueue_ab", "msgqueue_ba", "msgqueue_bc", "msgqueue_cb"};
-		vector<string>proc_names = {"/usr/bin/proc_a", "/usr/bin/proc_b", "/usr/bin/proc_c"};
+		vector<string>proc_names = {"proc_a", "proc_b", "proc_c"};
 		vector<string>shm_names = {"shm_ab", "shm_bc"};
 		vector<string>ipc_ids;
 		vector<key_t>shm_ftoks, mq_ftoks;

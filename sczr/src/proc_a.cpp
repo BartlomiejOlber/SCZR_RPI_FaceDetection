@@ -4,11 +4,13 @@
 #include <sys/ipc.h>
 #include <sys/msg.h>
 #include <sys/shm.h>
+#include <string.h>
+#include <errno.h>
 #include <sys/mman.h>
 #include <sys/time.h>
 #include <string>
 #include <iostream>
-#include "opencv2/core.hpp"
+#include <sys/resource.h>
 #include "opencv2/imgproc/imgproc.hpp"
 #include "opencv2/highgui/highgui.hpp"
 
@@ -27,6 +29,7 @@ typedef struct mesg_buffer
 int main(int argc, char *argv[])
 {
 
+	//setpriority(PRIO_USER,0,-20);
 
 	int shmid = atoi(argv[1]);
 	int send_queue_idx= atoi(argv[2]);
@@ -60,7 +63,8 @@ int main(int argc, char *argv[])
 	Mat curr_frame;
 
 	struct timeval start, stop;
-	Mat *tmp = new Mat(480,640,curr_frame.type());
+	Mat tmp = Mat(480,640,curr_frame.type());
+
 	while ( capture.read(curr_frame))
     {
         if( (curr_frame).empty() )
@@ -71,13 +75,13 @@ int main(int argc, char *argv[])
 		else
 		{
 			//pobraz timestamp
-			tmp->data = frame;
-			memcpy((u_char*)(tmp->data), curr_frame.data, curr_frame.step*curr_frame.rows);	
+			tmp.data = frame;
+			memcpy((u_char*)(tmp.data), curr_frame.data, curr_frame.step*curr_frame.rows);	
 			message.mesg_type = 1;
 			//wrzuc timestampa
 			gettimeofday(&start,NULL);
 			//w wysylanej wiadomosci wyslij aktualny czas w mikrosekundach
-
+			//cout<<"Pojawila sie po: "<<start.tv_usec-message.mesg_text[1]<<endl;
 			//informacja o sekundach
 			message.mesg_text[0] = start.tv_sec;
 			//informacja o mikrosekundach

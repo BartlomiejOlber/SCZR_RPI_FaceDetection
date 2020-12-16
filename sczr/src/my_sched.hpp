@@ -6,6 +6,7 @@
 #include <linux/types.h>
 #include <sched.h>
 #include <linux/sched.h>
+#include <errno.h>
 #include <sys/types.h>
 
 #define SCHED_DEADLINE  6
