@@ -89,7 +89,7 @@ int main(int argc, char *argv[])
 				msg_to_send.mesg_text[98]=message.mesg_text[1];
 
 
-				//cout<<"B - wykryto "<<faces.size()<<" twarzy\n";
+				cout<<"B - wykryto "<<faces.size()<<" twarzy\n";
 
 				for ( size_t i = 0; i < min(faces.size(),30); i++ )
 				{
@@ -108,8 +108,10 @@ int main(int argc, char *argv[])
 					offset+=crop.step*crop.rows;
 					//imwrite("plik_od_b.jpg",crop);
 				}
+cout<<"B - wysula \n";
 				msgsnd(send_queue_idx_c, &msg_to_send, sizeof(msg_to_send),0);
-				msgrcv(receive_queue_idx_c, &message, sizeof(message), 1, 0);
+				msgrcv(receive_queue_idx_c, &msg_to_send, sizeof(msg_to_send), 1, 0);
+cout<<"B - odebral \n";
 			}
 
 		}

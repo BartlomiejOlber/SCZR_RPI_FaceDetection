@@ -83,9 +83,11 @@ int main(int argc, char *argv[])
 			message.mesg_text[0] = start.tv_sec;
 			//informacja o mikrosekundach
 			message.mesg_text[1] = start.tv_usec;
+cout<<"A wysyla\n";
 
 			msgsnd(send_queue_idx, &message, sizeof(message), 0);
     		msgrcv(receive_queue_idx, &message, sizeof(message), 1, 0);
+cout<<"A odbral\n";		
 		}
 
     }

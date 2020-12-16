@@ -33,12 +33,12 @@ typedef struct mesg_buffer
 int secs,usces;
 u_char *frame;
 
-Message message;
-uint64_t receive_faces(vector<Mat> &detected_faces)
+uint64_t receive_faces(vector<Mat> &detected_faces, Message& message)
 {
 	Mat crop;
 	Rect face_frame;
 	msgrcv(receive_queue_idx_b, &message, sizeof(message), 1, 0);
+cout<<"C - odebral \n";
 
 	for(int i=0; i<message.mesg_text[99]; i++)
 	{
@@ -57,10 +57,13 @@ uint64_t receive_faces(vector<Mat> &detected_faces)
 		detected_faces.push_back(crop);
 	}
 	
-	//cout<<"ZAPISALO: "<<detected_faces.size()<<" twarzy\n";
+	cout<<"ZAPISALO: "<<detected_faces.size()<<" twarzy\n";
 	secs = message.mesg_text[97];
 	usces = message.mesg_text[98];
-	return (message.mesg_text[97]&0xFFFF)*1000000 + message.mesg_text[98];
+	uint64_t ret = (message.mesg_text[97]&0xFFFF)*1000000 + message.mesg_text[98];
+cout<<"C - wysyla \n";
+	msgsnd(send_queue_idx_b,&message , sizeof(message), 0);
+	return ret;
 }
 
 
@@ -135,7 +138,7 @@ int main(int argc, char *argv[])
 	
 	vector<Mat> wektor;
 	uint64_t starting_time;
-
+	Message message;
 	string timestamp_taken,timestamp_processed;
 
 	//tutaj naprawiamy timezone
@@ -149,7 +152,7 @@ int main(int argc, char *argv[])
 	while (true)
 	{
 		wektor.clear();
-		starting_time = receive_faces(wektor);
+		starting_time = receive_faces(wektor, message);
 
 		//tutaj mierzymy czas gdy sie skonczylo przetwarzanie, zapisujemy do 'stop'
 		gettimeofday(&stop,NULL);
@@ -180,9 +183,9 @@ int main(int argc, char *argv[])
 		// cout<<timestamp_taken<<endl;
 		// cout<<timestamp_processed<<endl<<endl;
 
-		if(wektor.size())
-			client.send_faces(wektor, timestamp_taken, timestamp_processed);
-		msgsnd(send_queue_idx_b,&message , sizeof(message), 0);
+		client.send_faces(wektor, timestamp_taken, timestamp_processed);
+cout<<"wyslal na serv \n";
+		
 	}
     return 0;
 }
