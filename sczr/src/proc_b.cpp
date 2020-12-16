@@ -45,7 +45,7 @@ int main(int argc, char *argv[])
 	int send_queue_idx_c= atoi(argv[5]);
 	int receive_queue_idx_c = atoi(argv[6]);
 
-	Mat *tmp_a = new Mat(480,640,16);
+	Mat tmp_a = Mat(480,640,16);
 	Message message;
 	Message msg_to_send;
 	CascadeClassifier face_cascade;
@@ -62,14 +62,14 @@ int main(int argc, char *argv[])
 	while (true)
 	{
 		msgrcv(receive_queue_idx_a, &message, sizeof(message), 1, 0);
-		tmp_a->data = frame_a;
+		tmp_a.data = frame_a;
 		
 		if(candetect)
 		{
 			Mat frame_gray;
 			Mat crop;
     		Mat res;
-			cvtColor( *tmp_a, frame_gray, COLOR_BGR2GRAY );
+			cvtColor( tmp_a, frame_gray, COLOR_BGR2GRAY );
     		equalizeHist( frame_gray, frame_gray );
 			vector<Rect> faces;
 			face_cascade.detectMultiScale( frame_gray, faces );
@@ -97,11 +97,11 @@ int main(int argc, char *argv[])
 					face_frame.y = faces[i].y;
 					face_frame.width = (faces[i].width);
 					face_frame.height = (faces[i].height);
-					Mat *tmp_c = new Mat(faces[i].height,faces[i].width,16);
-					crop = (*tmp_a)(face_frame);
-					tmp_c->data = frame_c;
+					Mat tmp_c = Mat(faces[i].height,faces[i].width,16);
+					crop = tmp_a(face_frame);
+					tmp_c.data = frame_c;
 					resize(crop, res, Size(128, 128), 0, 0, INTER_LINEAR); // This will be needed later while saving images
-					memcpy((u_char*)(tmp_c->data+offset), crop.data, crop.step*crop.rows);
+					memcpy((u_char*)(tmp_c.data+offset), crop.data, crop.step*crop.rows);
 					msg_to_send.mesg_text[3*i+0]=crop.rows;
 					msg_to_send.mesg_text[3*i+1]=crop.step;
 					msg_to_send.mesg_text[3*i+2]=offset;

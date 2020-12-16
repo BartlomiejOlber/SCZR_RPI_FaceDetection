@@ -11,6 +11,7 @@
 #include <wait.h>
 #include <vector>
 #include <string>
+// #include "my_sched.hpp"
 
 using namespace std;
 
@@ -157,10 +158,6 @@ int main()
 {
 	int i = 0;
 	while(true){
-		cout<<"d1"<<endl;
-cerr<<"d1e"<<endl;
-printf("aaa");
-		i++;
 		vector<string>mq_names = {"msgqueue_ab", "msgqueue_ba", "msgqueue_bc", "msgqueue_cb"};
 		vector<string>proc_names = {"/usr/bin/proc_a", "/usr/bin/proc_b", "/usr/bin/proc_c"};
 		vector<string>shm_names = {"shm_ab", "shm_bc"};
@@ -174,12 +171,11 @@ printf("aaa");
 		get_shared_memory_segments(shm_ftoks);
 		get_message_queues(mq_ftoks);
 		ipc_ids_to_string(ipc_ids);
-		cout<<"d2"<<endl;
 		signal(SIGCHLD, sigchld_handler);
 		signal(SIGINT, sigint_handler);
 		signal(SIGTERM, sigint_handler);
 		make_children_args(children_args, ipc_ids, proc_names);
-		cout<<"d3"<<endl;
+
 		start_children(children_args);
 		cout<<"d4"<<endl;
 		wait_for_children();

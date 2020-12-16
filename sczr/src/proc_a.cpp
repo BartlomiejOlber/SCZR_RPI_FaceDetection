@@ -60,11 +60,9 @@ int main(int argc, char *argv[])
 	Mat curr_frame;
 
 	struct timeval start, stop;
-	Mat *tmp = new Mat(480,640,curr_frame.type());
+	Mat tmp = Mat(480,640,curr_frame.type());
 	while ( capture.read(curr_frame))
     {
-		i++;
-		cout<<"a2 "<<i<<endl;
         if( (curr_frame).empty() )
         {
             std::cout << "--(!) No captured frame -- Break!\n";
@@ -73,8 +71,8 @@ int main(int argc, char *argv[])
 		else
 		{
 			//pobraz timestamp
-			tmp->data = frame;
-			memcpy((u_char*)(tmp->data), curr_frame.data, curr_frame.step*curr_frame.rows);	
+			tmp.data = frame;
+			memcpy((u_char*)(tmp.data), curr_frame.data, curr_frame.step*curr_frame.rows);
 			message.mesg_type = 1;
 			//wrzuc timestampa
 			gettimeofday(&start,NULL);

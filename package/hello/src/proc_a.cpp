@@ -5,6 +5,7 @@
 #include <sys/msg.h>
 #include <sys/shm.h>
 #include <sys/mman.h>
+#include <sys/time.h>
 #include <string>
 #include <iostream>
 #include "opencv2/core.hpp"
@@ -31,9 +32,9 @@ int main(int argc, char *argv[])
 	int send_queue_idx= atoi(argv[2]);
 	int receive_queue_idx = atoi(argv[3]);
 
-
 	size_t size = 640*480*3;
 
+	
 	
 	if(shmid<0)
 	{
@@ -49,22 +50,20 @@ int main(int argc, char *argv[])
 	if ( ! capture.isOpened() )
     {
         cout << "--(!)Error opening video capture\n";
+		return -1;
     }
-	else
-	{
-		cout<<"OTWARTO\n";
-	}
+	// else
+	// {
+	// 	cout<<"OTWARTO\n";
+	// }
+
 	Mat curr_frame;
 
-
-	Mat *tmp = new Mat(480,640,curr_frame.type());
-	int timer= 0;
-	int i = 0;
-	cout<<"a1"<<endl;
+	struct timeval start, stop;
+	Mat tmp = Mat(480,640,curr_frame.type());
 	while ( capture.read(curr_frame))
     {
-		i++;
-		cout<<"a2 "<<i<<endl;
+
         if( (curr_frame).empty() )
         {
             std::cout << "--(!) No captured frame -- Break!\n";
@@ -73,9 +72,18 @@ int main(int argc, char *argv[])
 		else
 		{
 			//pobraz timestamp
-			tmp->data = frame;
-			memcpy((u_char*)(tmp->data), curr_frame.data, curr_frame.step*curr_frame.rows);	
+			tmp.data = frame;
+			memcpy((u_char*)(tmp.data), curr_frame.data, curr_frame.step*curr_frame.rows);
 			message.mesg_type = 1;
+			//wrzuc timestampa
+			gettimeofday(&start,NULL);
+			//w wysylanej wiadomosci wyslij aktualny czas w mikrosekundach
+
+			//informacja o sekundach
+			message.mesg_text[0] = start.tv_sec;
+			//informacja o mikrosekundach
+			message.mesg_text[1] = start.tv_usec;
+
 			msgsnd(send_queue_idx, &message, sizeof(message), 0);
     		msgrcv(receive_queue_idx, &message, sizeof(message), 1, 0);
 		}
