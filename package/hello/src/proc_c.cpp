@@ -7,6 +7,7 @@
 #include <sys/msg.h>
 #include <sys/time.h>
 #include <sys/shm.h>
+#include <sys/resource.h>
 
 #include "opencv2/core.hpp"
 #include "opencv2/highgui/highgui.hpp"
@@ -38,7 +39,6 @@ uint64_t receive_faces(vector<Mat> &detected_faces, Message& message)
 	Mat crop;
 	Rect face_frame;
 	msgrcv(receive_queue_idx_b, &message, sizeof(message), 1, 0);
-cout<<"C - odebral \n";
 
 	for(int i=0; i<message.mesg_text[99]; i++)
 	{
@@ -57,11 +57,9 @@ cout<<"C - odebral \n";
 		detected_faces.push_back(crop);
 	}
 	
-	cout<<"ZAPISALO: "<<detected_faces.size()<<" twarzy\n";
 	secs = message.mesg_text[97];
 	usces = message.mesg_text[98];
 	uint64_t ret = (message.mesg_text[97]&0xFFFF)*1000000 + message.mesg_text[98];
-cout<<"C - wysyla \n";
 	msgsnd(send_queue_idx_b,&message , sizeof(message), 0);
 	return ret;
 }
@@ -130,10 +128,23 @@ private:
 
 int main(int argc, char *argv[])
 {
+	string server_address = "192.168.150.108";
+	if(argc == 6){
+		server_address = argv[4];
+		setpriority(PRIO_PROCESS,0,-20);	
+	}
+	if(argc == 5){
+		if(!strcmp(argv[4], "-p")){
+			setpriority(PRIO_PROCESS,0,-20);	
+		}else{
+			server_address = argv[4];
+		}
+	}
 
 	shmid_b = atoi(argv[1]);
 	send_queue_idx_b= atoi(argv[3]);
 	receive_queue_idx_b = atoi(argv[2]);
+	
 	struct timeval stop;
 	
 	vector<Mat> wektor;
@@ -141,33 +152,19 @@ int main(int argc, char *argv[])
 	Message message;
 	string timestamp_taken,timestamp_processed;
 
-	//tutaj naprawiamy timezone
 	time_t current_time;
 	time(&current_time);
 	struct tm *timeinfo = localtime(&current_time);
 	int offset = timeinfo->tm_gmtoff;
 
-	tcp_client client("192.168.150.108", 9000);
+	tcp_client client(server_address, 9000, 20480);
 	frame = (u_char*) shmat(shmid_b,(void*)0,0);
 	while (true)
 	{
 		wektor.clear();
 		starting_time = receive_faces(wektor, message);
 
-		//tutaj mierzymy czas gdy sie skonczylo przetwarzanie, zapisujemy do 'stop'
 		gettimeofday(&stop,NULL);
-		//stop_time teraz zamieniamy na same mikrosekundy
-		//uint64_t stop_time = (stop.tv_sec-offset)*1000000 + stop.tv_usec;// & 0x7FFFFFFF;
-		//to samo robimy z start_time
-		// uint64_t start_time = secs-offset;
-		// start_time*=1000000;
-		// start_time+=usces;
-
-
-		//tutaj wypisujemy o ktorej sie zaczelo przetwarzanie klatki i o ktorej
-		//sie ono skonczylo, dodatkowo ile trwala calosc
-		// cout<<"START:\t"<<start_time<<endl<<"STOP:\t"<<stop_time<<endl;
-		// cout<<"Zajelo: "<<stop_time-start_time<<" us"<<endl;
 
 		nowtime = (time_t)(secs-offset);
 		nowtm = localtime(&nowtime);
@@ -180,11 +177,8 @@ int main(int argc, char *argv[])
 		strftime(tmbuf, sizeof tmbuf, "%Y-%m-%d %H:%M:%S", nowtm);
 		snprintf(buf, sizeof buf, "%s.%06ld", tmbuf, stop.tv_usec);
 		timestamp_processed = string(buf);
-		// cout<<timestamp_taken<<endl;
-		// cout<<timestamp_processed<<endl<<endl;
 
 		client.send_faces(wektor, timestamp_taken, timestamp_processed);
-cout<<"wyslal na serv \n";
 		
 	}
     return 0;

@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <sys/resource.h>
 #include <sys/ipc.h>
 #include <sys/msg.h>
 #include <sys/shm.h>
@@ -36,8 +37,10 @@ int min(int a, int b)
 }
 
 int main(int argc, char *argv[])
-{
-
+{	
+	if(argv[7] && !strcmp(argv[7], "-p")){
+		setpriority(PRIO_PROCESS,0,-20);
+	}
 	int shmid_a = atoi(argv[1]);
 	int shmid_c = atoi(argv[4]);
 	int send_queue_idx_a= atoi(argv[3]);
@@ -89,7 +92,6 @@ int main(int argc, char *argv[])
 				msg_to_send.mesg_text[98]=message.mesg_text[1];
 
 
-				cout<<"B - wykryto "<<faces.size()<<" twarzy\n";
 
 				for ( size_t i = 0; i < min(faces.size(),30); i++ )
 				{
@@ -108,10 +110,8 @@ int main(int argc, char *argv[])
 					offset+=crop.step*crop.rows;
 					//imwrite("plik_od_b.jpg",crop);
 				}
-cout<<"B - wysula \n";
 				msgsnd(send_queue_idx_c, &msg_to_send, sizeof(msg_to_send),0);
 				msgrcv(receive_queue_idx_c, &msg_to_send, sizeof(msg_to_send), 1, 0);
-cout<<"B - odebral \n";
 			}
 
 		}

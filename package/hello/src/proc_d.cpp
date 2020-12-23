@@ -11,6 +11,7 @@
 #include <wait.h>
 #include <vector>
 #include <string>
+#include <string.h>
 // #include "my_sched.hpp"
 
 using namespace std;
@@ -111,7 +112,7 @@ void ipc_ids_to_string(vector<string>& args)
 	}
 }
 
-void make_children_args(vector<vector<char*> >& args, const vector<string>& ipc_ids, const vector<string>& proc_names)
+void make_children_args(vector<vector<char*> >& args, const vector<string>& ipc_ids, const vector<string>& proc_names, const string& addr = "", bool priority=false)
 {
 	vector<char*> v;
 	vector<int> ab= {0,2,3};
@@ -128,6 +129,10 @@ void make_children_args(vector<vector<char*> >& args, const vector<string>& ipc_
 				v.push_back(const_cast<char*>(ipc_ids[*i].c_str()));
 			}
 		}
+		if(addr != "" && *it == proc_names[2])
+			v.push_back(const_cast<char*>(addr.c_str()));
+		if(priority)
+			v.push_back(const_cast<char*>("-p"));
 		v.push_back(NULL);
 		args.push_back(v);
 		v.clear();
@@ -154,10 +159,11 @@ void wait_for_children()
 	}
 }
 
-int main()
+int main(int argc, char *argv[])
 {
 	int i = 0;
 	while(true){
+		
 		vector<string>mq_names = {"msgqueue_ab", "msgqueue_ba", "msgqueue_bc", "msgqueue_cb"};
 		vector<string>proc_names = {"/usr/bin/proc_a", "/usr/bin/proc_b", "/usr/bin/proc_c"};
 		vector<string>shm_names = {"shm_ab", "shm_bc"};
@@ -174,12 +180,25 @@ int main()
 		signal(SIGCHLD, sigchld_handler);
 		signal(SIGINT, sigint_handler);
 		signal(SIGTERM, sigint_handler);
-		make_children_args(children_args, ipc_ids, proc_names);
+		
+		string addr = "";
+		bool priority = false;
+		if(argc == 3){
+			addr = argv[1];
+			priority = true;
+		}
+		if(argc == 2){
+			if(!strcmp(argv[1], "-p")){
+				priority = true;
+			}else{
+				addr = argv[1];
+			}
+		}			
+		make_children_args(children_args, ipc_ids, proc_names, addr, priority);
 
 		start_children(children_args);
-		cout<<"d4"<<endl;
+
 		wait_for_children();
-		cout<<"d5"<<endl;
 	}
     return 0;
 }

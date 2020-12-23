@@ -6,6 +6,7 @@
 #include <sys/shm.h>
 #include <sys/mman.h>
 #include <sys/time.h>
+#include <sys/resource.h>
 #include <string>
 #include <iostream>
 #include "opencv2/core.hpp"
@@ -26,8 +27,9 @@ typedef struct mesg_buffer
 
 int main(int argc, char *argv[])
 {
-
-
+	if(argv[4] && !strcmp(argv[4], "-p")){
+		setpriority(PRIO_PROCESS,0,-20);	
+	}	
 	int shmid = atoi(argv[1]);
 	int send_queue_idx= atoi(argv[2]);
 	int receive_queue_idx = atoi(argv[3]);
@@ -52,10 +54,6 @@ int main(int argc, char *argv[])
         cout << "--(!)Error opening video capture\n";
 		return -1;
     }
-	// else
-	// {
-	// 	cout<<"OTWARTO\n";
-	// }
 
 	Mat curr_frame;
 
@@ -83,11 +81,9 @@ int main(int argc, char *argv[])
 			message.mesg_text[0] = start.tv_sec;
 			//informacja o mikrosekundach
 			message.mesg_text[1] = start.tv_usec;
-cout<<"A wysyla\n";
 
 			msgsnd(send_queue_idx, &message, sizeof(message), 0);
-    		msgrcv(receive_queue_idx, &message, sizeof(message), 1, 0);
-cout<<"A odbral\n";		
+    		msgrcv(receive_queue_idx, &message, sizeof(message), 1, 0);		
 		}
 
     }
